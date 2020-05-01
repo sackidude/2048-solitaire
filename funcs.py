@@ -1,16 +1,20 @@
-def map(value, leftMin, leftMax, rightMin, rightMax):
+"""All the functions in this projet"""
+
+def translate(value, left_min, left_max, right_min, right_max):
+    """This maps a value from one range to another"""
     # Figure out how 'wide' each range is
-    leftSpan = leftMax - leftMin
-    rightSpan = rightMax - rightMin
+    left_span = left_max - left_min
+    right_span = right_max - right_min
 
     # Convert the left range into a 0-1 range (float)
-    valueScaled = float(value - leftMin) / float(leftSpan)
+    value_scaled = float(value - left_min) / float(left_span)
 
     # Convert the 0-1 range into a value in the right range.
-    return rightMin + (valueScaled * rightSpan)
+    return right_min + (value_scaled * right_span)
 
 
-def renderMultiline(text, x, y, _screen, _font):
+def render_multiline(text, _x, _y, _screen, _font):
+    """A function for rendering several line strings"""
     render_arr = str.splitlines(text)
     for i, current_text in enumerate(render_arr):
         txt = _font.render(
@@ -18,4 +22,4 @@ def renderMultiline(text, x, y, _screen, _font):
             True,
             (255, 255, 255)
         )
-        _screen.blit(txt, (x, y + 20 * i))  # render the text
+        _screen.blit(txt, (_x, _y + 20 * i))  # render the text
