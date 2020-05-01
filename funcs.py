@@ -13,13 +13,13 @@ def translate(value, left_min, left_max, right_min, right_max):
     return right_min + (value_scaled * right_span)
 
 
-def render_multiline(text, _x, _y, _screen, _font):
+def render_multiline(text, _x, _y, _screen, _font, color):
     """A function for rendering several line strings"""
     render_arr = str.splitlines(text)
     for i, current_text in enumerate(render_arr):
         txt = _font.render(
             current_text,
             True,
-            (255, 255, 255)
+            color
         )
         _screen.blit(txt, (_x, _y + 20 * i))  # render the text
