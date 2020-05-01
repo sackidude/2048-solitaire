@@ -1,8 +1,9 @@
 """ This is a copy of the 2048 solitaire app.
     I'm going to add a machine learning ai to this thing
-    and see what score it can get later (hopefully) :)"""
-import random as ran
+    and see what score it can get later(hopefully): ) """
 
+import random as ran
+from time import sleep
 import pygame
 
 import cardclass
@@ -15,6 +16,7 @@ pygame.init()
 WIDTH = 500
 HEIGHT = 400
 RENDER = True
+
 
 def main():
     """Just the main function of this game"""
@@ -37,6 +39,7 @@ def main():
 
     done = False
     while not done:
+        game_over = False
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 done = True
@@ -62,7 +65,19 @@ def main():
                         piles.piles[current_key][5].value += 1
                         piles.update(current_key)
                         hand.cards.pop(0)
+                        hand.add_card(cardclass.Card(
+                            (ran.randrange(6) + 1), 70, 100))
+                    total_length = 0
+                    for current_pile in piles.piles:
+                        total_length += len(current_pile)
 
+                    if total_length >= 24:
+                        screen.fill((0, 0, 0))
+                        render_multiline("GAME OVER!\nYour score: {}".format(
+                            score), WIDTH/2, HEIGHT/2, screen, myfont, (255, 255, 255))
+                        done = True
+                        game_over = True
+                        break
                 if trashs > 0 and event.key == pygame.K_t:
                     # Throw away a card. Press the key K to activate
                     trashs -= 1
@@ -83,10 +98,13 @@ def main():
         piles.render(myfont, screen, pygame, WIDTH, HEIGHT)
         hand.render(myfont, screen, pygame, HEIGHT)
 
-        render_multiline("Score: " + str(score) + "\nMultiplier: "
-                         + str(multiplier), WIDTH - 200, HEIGHT - 60, screen, myfont)
+        render_multiline('Score: {}\nMultiplier: x{}\nTrashes: {}'.format(
+            score, multiplier, trashs) + '\nMix: ' + str(mix),
+                         WIDTH - 200, HEIGHT - 100, screen, myfont, (255, 255, 255))
 
         clock.tick(60)
+        if done and game_over:
+            sleep(2)
 
 
 if __name__ == "__main__":
