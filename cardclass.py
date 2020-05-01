@@ -4,6 +4,7 @@ import funcs
 
 class Card:
     """This is the class for a single card"""
+
     def __init__(self, _value, _width=70, _height=100, _canMove=False):
         self.value = _value
         self.width = _width
@@ -51,6 +52,7 @@ class Card:
 
 class Piles():
     """The class for the four piles in this game"""
+
     def __init__(self):
         self.piles = [[], [], [], []]
 
@@ -69,7 +71,7 @@ class Piles():
                     current_pile[len(
                         self.piles[update_pile_index]) - 1].value += 1
                     new_value = current_pile[len(
-                        self.piles[update_pile_index]) - 1].getValue()
+                        self.piles[update_pile_index]) - 1].get_value()
                     answer[0] += new_value
 
                     if new_value == 2048:
@@ -97,6 +99,7 @@ class Piles():
 
 class Hand():
     """This is the class for the two cards in the corner"""
+
     def __init__(self):
         self.cards = []
 
