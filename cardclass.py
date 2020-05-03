@@ -15,12 +15,17 @@ class NonRenderGame:
         self.mix = True
         self.max_cards = max_cards
 
+    def init_hand(self):
+        """Initiate the hand with two cards"""
+        for i in range(2):
+            self.hand.add_card(NonRenderCard(randrange(6) + 1))
+
     def place_card(self, _place):
         """This function takes a number between 0-3 and places a card there if it can."""
         if len(self.piles.piles[_place]) < self.max_cards:
             self.piles.add_card(self.hand.cards[0], _place)
             self.hand.cards.pop(0)
-            self.hand.add_card(Card((randrange(6) + 1), 70, 100))
+            self.hand.add_card(NonRenderCard((randrange(6) + 1)))
 
             answer = self.piles.update(_place)
             self.score += answer[0]
@@ -33,8 +38,7 @@ class NonRenderGame:
             self.piles.piles[_place][self.max_cards-1].value += 1
             self.piles.update(_place)
             self.hand.cards.pop(0)
-            self.hand.add_card(Card(
-                (randrange(6) + 1), 70, 100))
+            self.hand.add_card(NonRenderCard((randrange(6) + 1)))
 
     def check_game_over(self):
         """Function used for checking if game is over."""
@@ -65,6 +69,31 @@ class GameWithRender(NonRenderGame):
         self.height = _height
         self.width = _width
 
+    def init_hand(self):
+        """Initiate the hand with two cards"""
+        for i in range(2):
+            self.hand.add_card(Card(randrange(6) + 1))
+
+    def place_card(self, _place):
+        """This function takes a number between 0-3 and places a card there if it can."""
+        if len(self.piles.piles[_place]) < self.max_cards:
+            self.piles.add_card(self.hand.cards[0], _place)
+            self.hand.cards.pop(0)
+            self.hand.add_card(Card((randrange(6) + 1), 70, 100))
+
+            answer = self.piles.update(_place)
+            self.score += answer[0]
+            if answer[1]:
+                self.piles.piles[_place] = []
+                self.multiplier += 1
+                self.mix = True
+                self.trashes = 2
+        elif self.piles.piles[_place][self.max_cards-1].value == self.hand.cards[0].value:
+            self.piles.piles[_place][self.max_cards-1].value += 1
+            self.piles.update(_place)
+            self.hand.cards.pop(0)
+            self.hand.add_card(Card((randrange(6) + 1), 70, 100))
+
     def render(self, font, screen, pygame):
         """Renders hand and piles."""
         self.hand.render(font, screen, pygame, self.height)
@@ -83,7 +112,7 @@ class NonRenderCard():
 
 
 class Card(NonRenderCard):
-    """This is the class for a single card"""
+    """This is the class for a single card with rendering capabilities."""
 
     def __init__(self, _value, _width=70, _height=100, _canMove=False):
         super().__init__(_value)
@@ -190,7 +219,7 @@ class NonRenderHand():
     def trash(self, new_num):
         """Removes the card at the front and adds one to the end"""
         self.cards.pop(0)
-        self.add_card(Card(new_num, 70, 100))
+        self.add_card(NonRenderCard(new_num))
 
     def mix(self):
         """Switches the values of all the cards in the hand"""
