@@ -67,6 +67,7 @@ def main():
                         hand.cards.pop(0)
                         hand.add_card(cardclass.Card(
                             (ran.randrange(6) + 1), 70, 100))
+
                     total_length = 0
                     for current_pile in piles.piles:
                         total_length += len(current_pile)
