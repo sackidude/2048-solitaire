@@ -1,5 +1,40 @@
 """This is all the classes. card, piles and hand"""
+from random import randrange
 import funcs
+
+
+class NonRenderGame:
+    """This is the whole game class without any rendering."""
+
+    def __init__(self, max_cards):
+        self.hand = Hand()
+        self.piles = Piles()
+        self.score = 0
+        self.multiplier = 1
+        self.trashes = 2
+        self.mix = True
+        self.max_cards = max_cards
+
+    def place_card(self, _place):
+        """This function takes a number between 0-3 and places a card there if it can."""
+        if len(self.piles.piles[_place]) < self.max_cards:
+            self.piles.add_card(self.hand.cards[0], _place)
+            self.hand.cards.pop(0)
+            self.hand.add_card(Card((randrange(6) + 1), 70, 100))
+
+            answer = self.piles.update(_place)
+            self.score += answer[0]
+            if answer[1]:
+                self.piles.piles[_place] = []
+                self.multiplier += 1
+                self.mix = True
+                self.trashes = 2
+        elif self.piles.piles[_place][self.max_cards-1].value == self.hand.cards[0].value:
+            self.piles.piles[_place][self.max_cards-1].value += 1
+            self.piles.update(_place)
+            self.hand.cards.pop(0)
+            self.hand.add_card(Card(
+                (randrange(6) + 1), 70, 100))
 
 
 class Card:
