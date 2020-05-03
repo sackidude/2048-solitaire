@@ -51,7 +51,7 @@ class NonRenderGame:
     def trash(self):
         """Throw away a card from the hand."""
         self.trashes -= 1
-        self.hand.trash(NonRenderCard(randrange(6) + 1))
+        self.hand.trash()
 
     def mix_hand(self):
         """Mixes the cards in the hand."""
