@@ -52,7 +52,7 @@ class NonRenderGame:
     def mix_hand(self):
         """Mixes the cards in the hand."""
         self.mix = False
-        self.hand.mix(values)
+        self.hand.mix()
 
 
 class Card:
