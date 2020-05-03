@@ -7,8 +7,8 @@ class NonRenderGame:
     """This is the whole game class without any rendering."""
 
     def __init__(self, max_cards):
-        self.hand = Hand()
-        self.piles = Piles()
+        self.hand = NonRenderHand()
+        self.piles = NonRenderPiles()
         self.score = 0
         self.multiplier = 1
         self.trashes = 2
@@ -55,8 +55,25 @@ class NonRenderGame:
         self.hand.mix()
 
 
+class GameWithRender(NonRenderGame):
+    """Game With render function."""
+
+    def __init__(self, _max_card, _height, _width):
+        super().__init__(_max_card)
+        self.hand = Hand()
+        self.piles = Piles()
+        self.height = _height
+        self.width = _width
+
+    def render(self, font, screen, pygame):
+        """Renders hand and piles."""
+        self.hand.render(font, screen, pygame, self.height)
+        self.piles.render(font, screen, pygame, self.width, self.height)
+
+
 class NonRenderCard():
     """Just information about card without any rendering capabilities"""
+
     def __init__(self, _value):
         self.value = _value
 
@@ -109,8 +126,8 @@ class Card(NonRenderCard):
         _screen.blit(current_text, (x_cord, y_cord))  # render the text
 
 
-class Piles():
-    """The class for the four piles in this game"""
+class NonRenderPiles():
+    """Nonrender pile class. Parent to piles"""
 
     def __init__(self):
         self.piles = [[], [], [], []]
@@ -142,6 +159,14 @@ class Piles():
 
         return answer
 
+    def add_card(self, _card, _pile):
+        """Adds a card object to one of the piles"""
+        self.piles[_pile].append(_card)
+
+
+class Piles(NonRenderPiles):
+    """The class for the four piles in this game"""
+
     def render(self, _font, _screen, _pygame, _width, _height):
         """Render all the cards in the piles"""
         for i, current_pile in enumerate(self.piles):
@@ -151,13 +176,9 @@ class Piles():
 
                 current_card.render(_font, _screen, x_cord, y_cord, 2, _pygame)
 
-    def add_card(self, _card, _pile):
-        """Adds a card object to one of the piles"""
-        self.piles[_pile].append(_card)
 
-
-class Hand():
-    """This is the class for the two cards in the corner"""
+class NonRenderHand():
+    """NonRender hand parent to hand. Which has rendering functoin"""
 
     def __init__(self):
         self.cards = []
@@ -165,13 +186,6 @@ class Hand():
     def add_card(self, _card):
         """Adds a card to the end of the hand"""
         self.cards.append(_card)
-
-    def render(self, _font, screen, pygame, height):
-        """Renders the hand"""
-        idx = 0
-        for val in reversed(self.cards):
-            val.render(_font, screen, 50 + 35 * idx, height - 130, 2, pygame)
-            idx += 1
 
     def trash(self, new_num):
         """Removes the card at the front and adds one to the end"""
@@ -182,3 +196,14 @@ class Hand():
         """Switches the values of all the cards in the hand"""
         for i in range(0, len(self.cards)):
             self.cards[i].value = randrange(6)
+
+
+class Hand(NonRenderHand):
+    """This is the class for the two cards in the corner"""
+
+    def render(self, _font, screen, pygame, height):
+        """Renders the hand"""
+        idx = 0
+        for val in reversed(self.cards):
+            val.render(_font, screen, 50 + 35 * idx, height - 130, 2, pygame)
+            idx += 1
