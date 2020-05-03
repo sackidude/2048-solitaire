@@ -36,6 +36,14 @@ class NonRenderGame:
             self.hand.add_card(Card(
                 (randrange(6) + 1), 70, 100))
 
+    def check_game_over(self):
+        """Function used for checking if game is over."""
+        total_length = 0
+        for current_pile in self.piles.piles:
+            total_length += len(current_pile)
+
+        return bool(total_length >= 24)
+
 
 class Card:
     """This is the class for a single card"""
