@@ -66,6 +66,7 @@ def main():
         game.piles.render(myfont, screen, pygame, WIDTH, HEIGHT)
         game.hand.render(myfont, screen, pygame, HEIGHT)
 
+        # Render the text.
         render_multiline('Score: {}\nMultiplier: x{}\nTrashes: {}'.format(
             game.score, game.multiplier, game.trashes) + '\nMix: ' + str(game.mix),
                          WIDTH - 200, HEIGHT - 100, screen, myfont, (255, 255, 255))
