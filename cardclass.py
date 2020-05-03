@@ -44,8 +44,8 @@ class NonRenderGame:
 
         return bool(total_length >= 24)
 
-    def trash(self, _pile):
-        """Throw away a card from _pile."""
+    def trash(self):
+        """Throw away a card from the hand."""
         self.trashes -= 1
         self.hand.trash((randrange(6) + 1))
 
