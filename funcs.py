@@ -1,7 +1,7 @@
 """All the functions in this projet"""
 
 def translate(value, left_min, left_max, right_min, right_max):
-    """This maps a value from one range to another"""
+    """This maps a value from one range to another. TY to the guy on stackoverflow"""
     # Figure out how 'wide' each range is
     left_span = left_max - left_min
     right_span = right_max - right_min
