@@ -52,9 +52,6 @@ class NonRenderGame:
     def mix_hand(self):
         """Mixes the cards in the hand."""
         self.mix = False
-        values = []
-        for i in range(2):
-            values.append(randrange(6) + 1)
         self.hand.mix(values)
 
 
@@ -175,7 +172,7 @@ class Hand():
         self.cards.pop(0)
         self.add_card(Card(new_num, 70, 100))
 
-    def mix(self, values):
+    def mix(self):
         """Switches the values of all the cards in the hand"""
         for i in range(0, len(self.cards)):
-            self.cards[i].value = values[i]
+            self.cards[i].value = randrange(6)
