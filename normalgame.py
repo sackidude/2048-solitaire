@@ -2,7 +2,7 @@
 from time import sleep
 import pygame
 from funcs import render_multiline
-import cardclass
+from cardclass import GameWithRender
 
 def normal_game():
     """Just the main function of this game"""
@@ -14,7 +14,7 @@ def normal_game():
     clock = pygame.time.Clock()
     comic_sans_font = pygame.font.SysFont('Comic Sans MS', 20)
 
-    game = cardclass.GameWithRender(6, height, width)
+    game = GameWithRender(6, height, width)
     game.init_hand()
 
     done = False
