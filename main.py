@@ -2,7 +2,6 @@
     I'm going to add a machine learning ai to this thing
     and see what score it can get later(hopefully): ) """
 
-import random as ran
 from time import sleep
 import pygame
 
@@ -22,14 +21,10 @@ def main():
     """Just the main function of this game"""
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     clock = pygame.time.Clock()
-    myfont = pygame.font.SysFont('Comic Sans MS', 20)
+    comic_sans_font = pygame.font.SysFont('Comic Sans MS', 20)
 
-    game = cardclass.NonRenderGame(6)
-
-    i = 0
-    while i < 2:
-        game.hand.add_card(cardclass.Card((ran.randrange(6) + 1), 70, 100))
-        i += 1
+    game = cardclass.GameWithRender(6, HEIGHT, WIDTH)
+    game.init_hand()
 
     done = False
     while not done:
@@ -46,7 +41,8 @@ def main():
                     if game.check_game_over():
                         screen.fill((0, 0, 0))
                         render_multiline("GAME OVER!\nYour score: {}".format(
-                            game.score), WIDTH/2, HEIGHT/2, screen, myfont, (255, 255, 255))
+                            game.score), WIDTH / 2, HEIGHT / 2, screen,
+                                         comic_sans_font, (255, 255, 255))
                         done = True
                         game_over = True
                         break
@@ -62,14 +58,13 @@ def main():
         pygame.display.flip()
         screen.fill((50, 50, 50))  # Draw the background
 
-        # Render the pile and hand
-        game.piles.render(myfont, screen, pygame, WIDTH, HEIGHT)
-        game.hand.render(myfont, screen, pygame, HEIGHT)
+        # Render the game
+        game.render(comic_sans_font, screen, pygame)
 
         # Render the text.
         render_multiline('Score: {}\nMultiplier: x{}\nTrashes: {}'.format(
             game.score, game.multiplier, game.trashes) + '\nMix: ' + str(game.mix),
-                         WIDTH - 200, HEIGHT - 100, screen, myfont, (255, 255, 255))
+                         WIDTH - 200, HEIGHT - 100, screen, comic_sans_font, (255, 255, 255))
 
         clock.tick(60)
         if done and game_over:
