@@ -14,10 +14,21 @@ pygame.init()
 
 WIDTH = 500
 HEIGHT = 400
-RENDER = True
+
+if __name__ == "__main__":
+    main()
 
 
 def main():
+    """Main function. just decides if you are going to boot normal game or machine learning"""
+    input_text = input("Normal Game or Machine learning: [N/M]")
+    
+    if input_text == "M":
+        pass
+    else:
+        normal_game()
+
+def normal_game():
     """Just the main function of this game"""
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     clock = pygame.time.Clock()
@@ -71,5 +82,4 @@ def main():
             sleep(2)
 
 
-if __name__ == "__main__":
-    main()
+
