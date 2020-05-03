@@ -51,7 +51,7 @@ class NonRenderGame:
     def trash(self):
         """Throw away a card from the hand."""
         self.trashes -= 1
-        self.hand.trash((randrange(6) + 1))
+        self.hand.trash(NonRenderCard(randrange(6) + 1))
 
     def mix_hand(self):
         """Mixes the cards in the hand."""
@@ -72,7 +72,7 @@ class GameWithRender(NonRenderGame):
     def init_hand(self):
         """Initiate the hand with two cards"""
         for i in range(2):
-            self.hand.add_card(Card(randrange(6) + 1))
+            self.hand.add_card(Card((randrange(6) + 1), 70, 100))
 
     def place_card(self, _place):
         """This function takes a number between 0-3 and places a card there if it can."""
@@ -98,6 +98,11 @@ class GameWithRender(NonRenderGame):
         """Renders hand and piles."""
         self.hand.render(font, screen, pygame, self.height)
         self.piles.render(font, screen, pygame, self.width, self.height)
+
+    def trash(self):
+        """Throw away a card from the hand."""
+        self.trashes -= 1
+        self.hand.trash()
 
 
 class NonRenderCard():
@@ -216,15 +221,15 @@ class NonRenderHand():
         """Adds a card to the end of the hand"""
         self.cards.append(_card)
 
-    def trash(self, new_num):
+    def trash(self):
         """Removes the card at the front and adds one to the end"""
         self.cards.pop(0)
-        self.add_card(NonRenderCard(new_num))
+        self.add_card(NonRenderCard(randrange(6)+1))
 
     def mix(self):
         """Switches the values of all the cards in the hand"""
         for i in range(0, len(self.cards)):
-            self.cards[i].value = randrange(6)
+            self.cards[i].value = randrange(6)+1
 
 
 class Hand(NonRenderHand):
@@ -236,3 +241,8 @@ class Hand(NonRenderHand):
         for val in reversed(self.cards):
             val.render(_font, screen, 50 + 35 * idx, height - 130, 2, pygame)
             idx += 1
+
+    def trash(self):
+        """Removes the card at the front and adds one to the end"""
+        self.cards.pop(0)
+        self.add_card(Card(randrange(6)+1, 70, 100))
