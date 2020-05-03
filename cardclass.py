@@ -55,17 +55,23 @@ class NonRenderGame:
         self.hand.mix()
 
 
-class Card:
-    """This is the class for a single card"""
-
-    def __init__(self, _value, _width=70, _height=100, _canMove=False):
+class NonRenderCard():
+    """Just information about card without any rendering capabilities"""
+    def __init__(self, _value):
         self.value = _value
-        self.width = _width
-        self.height = _height
 
     def get_value(self):
         """This gets the not power two value of the card"""
         return 2 ** self.value
+
+
+class Card(NonRenderCard):
+    """This is the class for a single card"""
+
+    def __init__(self, _value, _width=70, _height=100, _canMove=False):
+        super().__init__(_value)
+        self.width = _width
+        self.height = _height
 
     def get_color(self):
         """Gets the color of the card. Will maybe be based on a color theme in the future"""
