@@ -44,6 +44,19 @@ class NonRenderGame:
 
         return bool(total_length >= 24)
 
+    def trash(self, _pile):
+        """Throw away a card from _pile."""
+        self.trashes -= 1
+        self.hand.trash((randrange(6) + 1))
+
+    def mix_hand(self):
+        """Mixes the cards in the hand."""
+        self.mix = False
+        values = []
+        for i in range(2):
+            values.append(randrange(6) + 1)
+        self.hand.mix(values)
+
 
 class Card:
     """This is the class for a single card"""
