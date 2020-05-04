@@ -5,7 +5,6 @@
 import normalgame
 import machinelearning
 
-
 def main():
     """Main function. just decides if you are going to boot normal game or machine learning"""
     input_text = input("Normal Game or Machine learning: [N/M]")
