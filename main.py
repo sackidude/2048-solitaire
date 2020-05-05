@@ -16,7 +16,7 @@ def main():
 
     if input_text == "M":
         local_dir = os.path.dirname(__file__)
-        config_path = os.path.join(local_dir, 'config-feedforward')
+        config_path = os.path.join(local_dir, 'config.txt')
         machine_learning(config_path)
     else:
         normalgame.normal_game()
