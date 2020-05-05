@@ -58,6 +58,23 @@ class NonRenderGame:
         self.mix = False
         self.hand.mix()
 
+    def get_network_inputs(self):
+        """
+        This function is for the machine learning.
+        It gives back an array of length 24 with the values(1-x not to 2048)of all of the cards.
+        """
+        return_array = []
+        for i in range(4):
+            for j in range(6):
+                try:
+                    self.piles.piles[i][j]
+                except IndexError:
+                    return_array.append(0)
+                else:
+                    return_array.append(self.piles.piles[i][j].value)
+
+        return return_array
+
 
 class GameWithRender(NonRenderGame):
     """Game With render function."""
