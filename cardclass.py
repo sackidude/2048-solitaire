@@ -39,6 +39,8 @@ class NonRenderGame:
             self.piles.update(_place)
             self.hand.cards.pop(0)
             self.hand.add_card(NonRenderCard((randrange(6) + 1)))
+        else:
+            return "Could not place"
 
     def check_game_over(self):
         """Function used for checking if game is over."""
@@ -85,7 +87,7 @@ class NonRenderGame:
             return_array.append(1)
         else:
             return_array.append(0)
-        
+
         return return_array
 
 

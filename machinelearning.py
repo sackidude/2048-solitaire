@@ -4,7 +4,6 @@ It trains the AI using the neat python library.
 """
 
 import neat
-from numpy import concatenate
 
 from cardclass import NonRenderGame  # , GameWithRender # Will add the game
 
@@ -35,7 +34,23 @@ def eval_genomes(genomes, config):
             # Evaluate the current game situation
             result = net.activate(game.get_network_inputs())
 
-            # Execute the 
+            # Execute the results from the neural network.
+            # The first four numbers in the list are for where to place the card.
+            card_rankings = result[0:4] # Get the first 4 nums
+
+            # Loop over because if it's full pile it has to place in another place
+            placed = False
+            while not placed:
+                highest_num = max(card_rankings)
+                highest_place = card_rankings.index(highest_num)
+
+                game.place_card(highest_place)
+
+            # Check if it's game over
+            if game.check_game_over():
+                scores.append(game.score)
+                print("I lost with a score of: " + str(game.score))
+                done = True
 
 
 def machine_learning(config_file):
