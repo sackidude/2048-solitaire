@@ -64,6 +64,8 @@ class NonRenderGame:
         It gives back an array of length 24 with the values(1-x not to 2048)of all of the cards.
         """
         return_array = []
+
+        # Add the pile values to the array
         for i in range(4):
             for j in range(6):
                 try:
@@ -73,6 +75,17 @@ class NonRenderGame:
                 else:
                     return_array.append(self.piles.piles[i][j].value)
 
+        # Add the hand to the array
+        for card in self.hand.cards:
+            return_array.append(card.value)
+
+        # Add the amount of trashes and if there is a mix
+        return_array.append(self.trashes)
+        if self.mix:
+            return_array.append(1)
+        else:
+            return_array.append(0)
+        
         return return_array
 
 
