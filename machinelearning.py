@@ -4,15 +4,38 @@ It trains the AI using the neat python library.
 """
 
 import neat
+from numpy import concatenate
+
+from cardclass import NonRenderGame  # , GameWithRender # Will add the game
+
+# with render when i get to making some visulizestion of the winning neural network
+
+MAX_CARDS = 6
 
 
-def eval_genomes():
+def eval_genomes(genomes, config):
     """
     This is the function for testing the model and seeing it's results.
     The fitness of each genome will be calculated by taking the score that they can acheive.
     It gets exponentially large the better the genome preforms,
     just because of how the game is built.
+    Not doing this with all of them at the same time because they don't share anything.
     """
+
+    # Go through all of the all the genomes and see how they do.
+    scores = []
+    for genome_id, genome in genomes:
+        genome.fitness = 0  # start with fitness level of 0
+        net = neat.nn.FeedForwardNetwork.create(genome, config)
+        game = NonRenderGame(MAX_CARDS)
+        game.init_hand()
+
+        done = False
+        while not done:
+            # Evaluate the current game situation
+            result = net.activate(game.get_network_inputs())
+
+            # Execute the 
 
 
 def machine_learning(config_file):
@@ -31,8 +54,8 @@ def machine_learning(config_file):
     population = neat.Population(config)
 
     # Add a stdout reporter to show progress in the terminal.
-    population.add_reporter(neat.StdOutReporter(True)) # What does this do?
-    stats = neat.StatisticsReporter() # Show the statistics
+    population.add_reporter(neat.StdOutReporter(True))  # What does this do?
+    stats = neat.StatisticsReporter()  # Show the statistics
     population.add_reporter(stats)
     population.add_reporter(neat.Checkpointer(5))
 
