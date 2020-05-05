@@ -1,23 +1,38 @@
-"""This is the document for machine learning part of this program."""
+"""
+This is the document for machine learning part of this program.
+It trains the AI using the neat python library.
+"""
 
 import neat
 
+
 def eval_genomes():
-    """This is the function for testing the model and seeing it's results"""
+    """
+    This is the function for testing the model and seeing it's results.
+    The fitness of each genome will be calculated by taking the score that they can acheive.
+    It gets exponentially large the better the genome preforms,
+    just because of how the game is built.
+    """
+
 
 def machine_learning(config_file):
-    """Machine learning part of this program. Will train an ai to be really good at this game."""
+    """
+    Machine learning part of this program.
+    This will train an ai to be (hopefully) be really good at this game.
+    Then show the results with a game with rendering capabilities from pygame.
+    """
+
     # Load configuration.
     config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
                          neat.DefaultSpeciesSet, neat.DefaultStagnation,
                          config_file)
 
-    # Create the population, which is the top-level object for a NEAT run.
+    # Create the population, by using the config just loaded.
     population = neat.Population(config)
 
     # Add a stdout reporter to show progress in the terminal.
-    population.add_reporter(neat.StdOutReporter(True))
-    stats = neat.StatisticsReporter()
+    population.add_reporter(neat.StdOutReporter(True)) # What does this do?
+    stats = neat.StatisticsReporter() # Show the statistics
     population.add_reporter(stats)
     population.add_reporter(neat.Checkpointer(5))
 
