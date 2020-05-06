@@ -130,3 +130,6 @@ dmypy.json
 
 # vscode
 .vscode/
+
+# Neat python
+neat-checkpoint*
