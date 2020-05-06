@@ -11,8 +11,10 @@ from machinelearning import machine_learning
 
 
 def main():
-    """Main function. just decides if you are going to boot normal game or machine learning"""
-    input_text = input("Normal Game or Machine learning: [N/M]")
+    """
+    Main function. just decides if you are going to boot normal game or machine learning
+    """
+    input_text = input("Normal Game or Machine learning[N/M]: ")
 
     if input_text == "M":
         local_dir = os.path.dirname(__file__)
