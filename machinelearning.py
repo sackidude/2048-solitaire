@@ -29,6 +29,8 @@ def eval_genomes(genomes, config):
         game = NonRenderGame(MAX_CARDS)
         game.init_hand()
 
+        scores = []
+
         done = False
         while not done:
             # Evaluate the current game situation
@@ -37,13 +39,13 @@ def eval_genomes(genomes, config):
             # Execute the results from the neural network.
             # The first four numbers in the list are for where to place the card.
             card_rankings = result[0:4] # Get the first 4 nums
-
+            
             # Loop over because if it's full pile it has to place in another place
             placed = False
             while not placed:
                 highest_num = max(card_rankings)
                 highest_place = card_rankings.index(highest_num)
-
+                #print(len(game.piles.piles[0]), len(game.piles.piles[1]), len(game.piles.piles[2]), len(game.piles.piles[3]))
                 if game.place_card(highest_place) == False:
                     card_rankings.pop(highest_place)
                 else:
@@ -52,9 +54,10 @@ def eval_genomes(genomes, config):
 
             # Check if it's game over
             if game.check_game_over():
-                scores.append(game.score)
                 print("I lost with a score of: " + str(game.score))
+                genome.fitness = game.score
                 done = True
+
 
 
 def machine_learning(config_file):

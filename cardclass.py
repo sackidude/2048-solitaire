@@ -128,8 +128,8 @@ class GameWithRender(NonRenderGame):
 
     def render(self, font, screen, pygame):
         """Renders hand and piles."""
-        self.hand.render(font, screen, pygame, self.height)
         self.piles.render(font, screen, pygame, self.width, self.height)
+        self.hand.render(font, screen, pygame, self.height)
 
     def trash(self):
         """Throw away a card from the hand."""
