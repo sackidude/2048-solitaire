@@ -29,27 +29,27 @@ def eval_genomes(genomes, config):
         game = NonRenderGame(MAX_CARDS)
         game.init_hand()
 
-        scores = []
-
         done = False
         while not done:
             # Evaluate the current game situation
             result = net.activate(game.get_network_inputs())
 
             # Execute the results from the neural network.
-            # The first four numbers in the list are for where to place the card.
-            card_rankings = result[0:4] # Get the first 4 nums
-            
-            # Loop over because if it's full pile it has to place in another place
-            placed = False
-            while not placed:
-                highest_num = max(card_rankings)
-                highest_place = card_rankings.index(highest_num)
-                #print(len(game.piles.piles[0]), len(game.piles.piles[1]), len(game.piles.piles[2]), len(game.piles.piles[3]))
-                if game.place_card(highest_place) == False:
-                    card_rankings.pop(highest_place)
+            highest_place = result.index(max(result))
+            if highest_place > 4:
+                # Four is four trash
+                if highest_place == 4:
+                    game.trash()
+                elif highest_place == 5:
+                    game.mix_hand()
+            else:
+                if len(game.piles.piles[highest_place]) < 6:
+                    game.place_card(highest_place)
                 else:
-                    placed = True
+                    done = True
+                    genome.fitness = game.score
+                    break
+
 
 
             # Check if it's game over
