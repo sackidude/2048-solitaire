@@ -40,7 +40,7 @@ class NonRenderGame:
             self.hand.cards.pop(0)
             self.hand.add_card(NonRenderCard((randrange(6) + 1)))
         else:
-            return "Could not place"
+            return False
 
     def check_game_over(self):
         """Function used for checking if game is over."""

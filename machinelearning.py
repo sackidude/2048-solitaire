@@ -44,7 +44,11 @@ def eval_genomes(genomes, config):
                 highest_num = max(card_rankings)
                 highest_place = card_rankings.index(highest_num)
 
-                game.place_card(highest_place)
+                if game.place_card(highest_place) == False:
+                    card_rankings.pop(highest_place)
+                else:
+                    placed = True
+
 
             # Check if it's game over
             if game.check_game_over():
