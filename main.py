@@ -15,7 +15,7 @@ def main():
         local_dir = os.path.dirname(__file__)
         config_path = os.path.join(local_dir, 'machine_learning/config.txt')
         machine_learning(config_path)
-    elif input_text == "M":
+    elif input_text == "N":
         import normalgame
         normalgame.normal_game()
     else:
