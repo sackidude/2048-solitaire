@@ -4,6 +4,9 @@ It trains the AI using the neat python library.
 """
 
 import neat
+import matplotlib
+import matplotlib.pyplot as plt
+from operator import attrgetter
 
 from cardclass import NonRenderGame  # , GameWithRender # Will add the game
 
@@ -27,8 +30,6 @@ def eval_genomes(genomes, config):
         net = neat.nn.FeedForwardNetwork.create(genome, config)
         game = NonRenderGame(MAX_CARDS)
         game.init_hand()
-
-        scores = []
 
         done = False
         while not done:
@@ -68,7 +69,13 @@ def eval_genomes(genomes, config):
                 print("I lost with a score of: " + str(game.score))
                 genome.fitness = game.score
                 done = True
-
+    
+    global highest_values
+    highest_values.append(max(genomes, key=attrgetter('fitness')))
+    
+    plt.plot(highest_values)
+    plt.ylabel("Fitness")
+    plt.show()
 
 
 def machine_learning(config_file):
@@ -93,6 +100,7 @@ def machine_learning(config_file):
     population.add_reporter(neat.Checkpointer(5))
 
     # Run for up to 300 generations.
+    highest_values = []
     winner = population.run(eval_genomes, 300)
 
     # Display the winning genome.
