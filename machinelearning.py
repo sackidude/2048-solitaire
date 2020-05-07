@@ -4,8 +4,8 @@ It trains the AI using the neat python library.
 """
 
 import neat
-import matplotlib
-import matplotlib.pyplot as plt
+import numpy as np
+from matplotlib import pyplot as plt
 from operator import attrgetter
 
 from cardclass import NonRenderGame  # , GameWithRender # Will add the game
@@ -31,6 +31,7 @@ def eval_genomes(genomes, config):
         game = NonRenderGame(MAX_CARDS)
         game.init_hand()
 
+        temp_highest = -1
         done = False
         while not done:
             # Evaluate the current game situation
@@ -43,12 +44,16 @@ def eval_genomes(genomes, config):
                 if game.place_card(highest_place) == False:
                     genome.fitness = game.score
                     done = True
+                    if game.score > temp_highest:
+                        temp_highest = game.score
                     break
             elif highest_place < 6:
                 if highest_place == 4:
                     if game.trashes == 0:
                         genome.fitness = game.score
                         done = True
+                        if game.score > temp_highest:
+                            temp_highest = game.score
                         break
                     else:
                         game.trash()
@@ -59,24 +64,27 @@ def eval_genomes(genomes, config):
                     else:
                         genome.fitness = game.score
                         done = True
+                        if game.score > temp_highest:
+                            temp_highest = game.score
                         break  
-                    
-
-
 
             # Check if it's game over
             if game.check_game_over():
                 print("I lost with a score of: " + str(game.score))
                 genome.fitness = game.score
+                if game.score > temp_highest:
+                    temp_highest = game.score
                 done = True
     
     global highest_values
-    highest_values.append(max(genomes, key=attrgetter('fitness')))
+    highest_values.append(temp_highest)
     
-    plt.plot(highest_values)
-    plt.ylabel("Fitness")
-    plt.show()
+    plt.clf()
+    plt.plot(np.arange(len(highest_values)), highest_values)
+    plt.pause(0.01)
 
+    
+highest_values = []
 
 def machine_learning(config_file):
     """
@@ -100,13 +108,11 @@ def machine_learning(config_file):
     population.add_reporter(neat.Checkpointer(5))
 
     # Run for up to 300 generations.
-    highest_values = []
     winner = population.run(eval_genomes, 300)
 
     # Display the winning genome.
     print('\nBest genome:\n{!s}'.format(winner))
 
     # We will show the ai playing a match here later when i add that feature.
-
     population = neat.Checkpointer.restore_checkpoint('neat-checkpoint-4')
     population.run(eval_genomes, 10)
