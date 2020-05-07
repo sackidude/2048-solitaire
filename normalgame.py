@@ -53,9 +53,14 @@ def normal_game():
         game.render(comic_sans_font, screen, pygame)
 
         # Render the text.
-        render_multiline('Score: {}\nMultiplier: x{}\nTrashes: {}'.format(
-            game.score, game.multiplier, game.trashes) + '\nMix: ' + str(game.mix),
-                         width - 200, height - 100, screen, comic_sans_font, (255, 255, 255))
+        string_to_show = 'Score: {}\nMultiplier: x{}\nTrashes: {}'.format(
+            game.score, game.multiplier, game.trashes) + '\nMix: ' + str(game.mix)
+        render_multiline(
+            string_to_show,
+            width - 200, height - 100,
+            screen, comic_sans_font,
+            (255, 255, 255)
+        )
 
         clock.tick(60)
         if done and game_over:
