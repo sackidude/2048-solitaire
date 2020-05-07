@@ -5,15 +5,20 @@ It trains the AI using the neat python library.
 
 import neat
 import numpy as np
+import pygame
 from matplotlib import pyplot as plt
-from operator import attrgetter
 
-from cardclass import NonRenderGame  # , GameWithRender # Will add the game
+from cardclass import GameWithRender  # , GameWithRender # Will add the game
+from cardclass import NonRenderGame
+from funcs import render_multiline
 
 # with render when i get to making some visulizestion of the winning neural network
 
 MAX_CARDS = 6
+WIDTH = 500
+HEIGHT = 400
 
+highest_values = []
 
 def eval_genomes(genomes, config):
     """
@@ -41,6 +46,7 @@ def eval_genomes(genomes, config):
             # The first four numbers in the list are for where to place the card.
             highest_place = result.index(max(result)) # Get the highest num
             if highest_place < 4:
+                 # Comparison to false because it's normally None
                 if game.place_card(highest_place) == False:
                     genome.fitness = game.score
                     done = True
@@ -57,7 +63,7 @@ def eval_genomes(genomes, config):
                         break
                     else:
                         game.trash()
-                    
+
                 else:
                     if game.mix:
                         game.mix_hand()
@@ -66,7 +72,7 @@ def eval_genomes(genomes, config):
                         done = True
                         if game.score > temp_highest:
                             temp_highest = game.score
-                        break  
+                        break
 
             # Check if it's game over
             if game.check_game_over():
@@ -75,16 +81,13 @@ def eval_genomes(genomes, config):
                 if game.score > temp_highest:
                     temp_highest = game.score
                 done = True
-    
-    global highest_values
+
     highest_values.append(temp_highest)
-    
+
     plt.clf()
     plt.plot(np.arange(len(highest_values)), highest_values)
     plt.pause(0.01)
 
-    
-highest_values = []
 
 def machine_learning(config_file):
     """
@@ -113,6 +116,42 @@ def machine_learning(config_file):
     # Display the winning genome.
     print('\nBest genome:\n{!s}'.format(winner))
 
-    # We will show the ai playing a match here later when i add that feature.
     population = neat.Checkpointer.restore_checkpoint('neat-checkpoint-4')
     population.run(eval_genomes, 10)
+
+    # We will show the ai playing a match here later when i add that feature.
+    if input("Do you want to look a game of the best genome?[Y/n]: ") != "n":
+        game = GameWithRender(MAX_CARDS, 500, 400)
+        game.init_hand()
+        pygame.init()
+        screen = pygame.display.set_mode((WIDTH, HEIGHT))
+        clock = pygame.time.Clock()
+        comic_sans_font = pygame.font.SysFont('Comic Sans MS', 20)
+
+        net = neat.nn.FeedForwardNetwork.create(winner, config)
+
+        done = False
+        while not done:
+            pygame.display.flip()
+            screen.fill((50, 50, 50))  # Draw the background
+
+            # Render the game
+            game.render(comic_sans_font, screen, pygame)
+
+            # Render the text.
+            render_multiline('Score: {}\nMultiplier: x{}\nTrashes: {}'.format(
+                game.score, game.multiplier, game.trashes) + '\nMix: ' + str(game.mix),
+                             WIDTH - 200, HEIGHT - 100, screen, comic_sans_font, (255, 255, 255))
+
+            clock.tick(60)
+
+            # Get the networks choice
+            result = net.activate(game.get_network_inputs())
+            highest_place = result.index(max(result))
+            # Preform the result
+            if highest_place < 4:
+                game.place_card(highest_place)
+            elif highest_place == 4:
+                game.trash()
+            else:
+                game.mix_hand()
