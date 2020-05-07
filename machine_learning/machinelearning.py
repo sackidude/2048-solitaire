@@ -110,7 +110,6 @@ def machine_learning(config_file):
 
     # Calculate what the last checkpoint will be.
     last_checkpoint = CHECKPOINT_GAP * floor(how_many / CHECKPOINT_GAP) - 1
-    print(last_checkpoint)
     population = neat.Checkpointer.restore_checkpoint(
         'neat-checkpoint-' + str(last_checkpoint))
     population.run(eval_genomes, 10)
