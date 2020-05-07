@@ -4,6 +4,9 @@ It trains the AI using the neat python library.
 """
 
 import neat
+import numpy as np
+from matplotlib import pyplot as plt
+from operator import attrgetter
 
 from cardclass import NonRenderGame  # , GameWithRender # Will add the game
 
@@ -22,43 +25,66 @@ def eval_genomes(genomes, config):
     """
 
     # Go through all of the all the genomes and see how they do.
-    scores = []
     for genome_id, genome in genomes:
         genome.fitness = 0  # start with fitness level of 0
         net = neat.nn.FeedForwardNetwork.create(genome, config)
         game = NonRenderGame(MAX_CARDS)
         game.init_hand()
 
+        temp_highest = -1
         done = False
         while not done:
             # Evaluate the current game situation
             result = net.activate(game.get_network_inputs())
 
             # Execute the results from the neural network.
-            highest_place = result.index(max(result))
-            if highest_place > 4:
-                # Four is four trash
-                if highest_place == 4:
-                    game.trash()
-                elif highest_place == 5:
-                    game.mix_hand()
-            else:
-                if len(game.piles.piles[highest_place]) < 6:
-                    game.place_card(highest_place)
-                else:
-                    done = True
+            # The first four numbers in the list are for where to place the card.
+            highest_place = result.index(max(result)) # Get the highest num
+            if highest_place < 4:
+                if game.place_card(highest_place) == False:
                     genome.fitness = game.score
+                    done = True
+                    if game.score > temp_highest:
+                        temp_highest = game.score
                     break
-
-
+            elif highest_place < 6:
+                if highest_place == 4:
+                    if game.trashes == 0:
+                        genome.fitness = game.score
+                        done = True
+                        if game.score > temp_highest:
+                            temp_highest = game.score
+                        break
+                    else:
+                        game.trash()
+                    
+                else:
+                    if game.mix:
+                        game.mix_hand()
+                    else:
+                        genome.fitness = game.score
+                        done = True
+                        if game.score > temp_highest:
+                            temp_highest = game.score
+                        break  
 
             # Check if it's game over
             if game.check_game_over():
                 print("I lost with a score of: " + str(game.score))
                 genome.fitness = game.score
+                if game.score > temp_highest:
+                    temp_highest = game.score
                 done = True
+    
+    global highest_values
+    highest_values.append(temp_highest)
+    
+    plt.clf()
+    plt.plot(np.arange(len(highest_values)), highest_values)
+    plt.pause(0.01)
 
-
+    
+highest_values = []
 
 def machine_learning(config_file):
     """
@@ -88,6 +114,5 @@ def machine_learning(config_file):
     print('\nBest genome:\n{!s}'.format(winner))
 
     # We will show the ai playing a match here later when i add that feature.
-
     population = neat.Checkpointer.restore_checkpoint('neat-checkpoint-4')
     population.run(eval_genomes, 10)
