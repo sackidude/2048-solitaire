@@ -94,8 +94,9 @@ def machine_learning(config_file):
     population.add_reporter(stats)
     population.add_reporter(neat.Checkpointer(5))
 
+    how_many = int(input("How many iterations do you want to train the genomes? "))
     # Run for up to 300 generations.
-    winner = population.run(eval_genomes, 50)
+    winner = population.run(eval_genomes, how_many)
 
     # Display the winning genome.
     print('\nBest genome:\n{!s}'.format(winner))
