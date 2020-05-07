@@ -21,7 +21,12 @@ class NonRenderGame:
             self.hand.add_card(NonRenderCard(randrange(6) + 1))
 
     def place_card(self, _place):
-        """This function takes a number between 0-3 and places a card there if it can."""
+        """
+        This function takes a number between 0-3 and places a card there if it can.
+        It return true if it placed a card.
+        This is only used in the msachine learning part of the program.
+        """
+
         if len(self.piles.piles[_place]) < self.max_cards:
             self.piles.add_card(self.hand.cards[0], _place)
             self.hand.cards.pop(0)
@@ -34,11 +39,13 @@ class NonRenderGame:
                 self.multiplier += 1
                 self.mix = True
                 self.trashes = 2
+            return True
         elif self.piles.piles[_place][self.max_cards-1].value == self.hand.cards[0].value:
             self.piles.piles[_place][self.max_cards-1].value += 1
             self.piles.update(_place)
             self.hand.cards.pop(0)
             self.hand.add_card(NonRenderCard((randrange(6) + 1)))
+            return True
         else:
             return False
 
