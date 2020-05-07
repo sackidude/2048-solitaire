@@ -4,9 +4,7 @@ It trains the AI using the neat python library.
 """
 
 import neat
-import numpy as np
 import pygame
-from matplotlib import pyplot as plt
 
 from cardclass import GameWithRender  # , GameWithRender # Will add the game
 from cardclass import NonRenderGame
@@ -18,7 +16,13 @@ MAX_CARDS = 6
 WIDTH = 500
 HEIGHT = 400
 
-highest_values = []
+def give_fitness(genome, score, _done):
+    """
+    This is to not repeat myself that much.
+    It sets the genome fitness to a score and sets done to true
+    """
+    genome.fitness = score
+    _done = True
 
 def eval_genomes(genomes, config):
     """
@@ -36,7 +40,6 @@ def eval_genomes(genomes, config):
         game = NonRenderGame(MAX_CARDS)
         game.init_hand()
 
-        temp_highest = -1
         done = False
         while not done:
             # Evaluate the current game situation
@@ -44,22 +47,16 @@ def eval_genomes(genomes, config):
 
             # Execute the results from the neural network.
             # The first four numbers in the list are for where to place the card.
-            highest_place = result.index(max(result)) # Get the highest num
+            highest_place = result.index(max(result))  # Get the highest num
             if highest_place < 4:
                  # Comparison to false because it's normally None
-                if game.place_card(highest_place) == False:
-                    genome.fitness = game.score
-                    done = True
-                    if game.score > temp_highest:
-                        temp_highest = game.score
+                if not game.place_card(highest_place):
+                    give_fitness(genome, game.score, done)
                     break
             elif highest_place < 6:
                 if highest_place == 4:
                     if game.trashes == 0:
-                        genome.fitness = game.score
-                        done = True
-                        if game.score > temp_highest:
-                            temp_highest = game.score
+                        give_fitness(genome, game.score, done)
                         break
                     else:
                         game.trash()
@@ -68,25 +65,12 @@ def eval_genomes(genomes, config):
                     if game.mix:
                         game.mix_hand()
                     else:
-                        genome.fitness = game.score
-                        done = True
-                        if game.score > temp_highest:
-                            temp_highest = game.score
+                        give_fitness(genome, game.score, done)
                         break
 
             # Check if it's game over
             if game.check_game_over():
-                print("I lost with a score of: " + str(game.score))
-                genome.fitness = game.score
-                if game.score > temp_highest:
-                    temp_highest = game.score
-                done = True
-
-    highest_values.append(temp_highest)
-
-    plt.clf()
-    plt.plot(np.arange(len(highest_values)), highest_values)
-    plt.pause(0.01)
+                give_fitness(genome, game.score, done)
 
 
 def machine_learning(config_file):
@@ -111,7 +95,7 @@ def machine_learning(config_file):
     population.add_reporter(neat.Checkpointer(5))
 
     # Run for up to 300 generations.
-    winner = population.run(eval_genomes, 300)
+    winner = population.run(eval_genomes, 50)
 
     # Display the winning genome.
     print('\nBest genome:\n{!s}'.format(winner))
@@ -119,7 +103,7 @@ def machine_learning(config_file):
     population = neat.Checkpointer.restore_checkpoint('neat-checkpoint-4')
     population.run(eval_genomes, 10)
 
-    # We will show the ai playing a match here later when i add that feature.
+    # We will show the ai playing a game here.
     if input("Do you want to look a game of the best genome?[Y/n]: ") != "n":
         game = GameWithRender(MAX_CARDS, 500, 400)
         game.init_hand()
@@ -131,7 +115,12 @@ def machine_learning(config_file):
         net = neat.nn.FeedForwardNetwork.create(winner, config)
 
         done = False
+        i = 0
         while not done:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    done = True
+
             pygame.display.flip()
             screen.fill((50, 50, 50))  # Draw the background
 
@@ -139,19 +128,30 @@ def machine_learning(config_file):
             game.render(comic_sans_font, screen, pygame)
 
             # Render the text.
-            render_multiline('Score: {}\nMultiplier: x{}\nTrashes: {}'.format(
-                game.score, game.multiplier, game.trashes) + '\nMix: ' + str(game.mix),
-                             WIDTH - 200, HEIGHT - 100, screen, comic_sans_font, (255, 255, 255))
+            string_to_show = 'Score: {}\nMultiplier: x{}\nTrashes: {}'.format(
+                game.score, game.multiplier, game.trashes) + '\nMix: ' + str(game.mix)
+            render_multiline(
+                string_to_show,
+                WIDTH - 200, HEIGHT - 100,
+                screen, comic_sans_font,
+                (255, 255, 255)
+            )
 
             clock.tick(60)
 
-            # Get the networks choice
-            result = net.activate(game.get_network_inputs())
-            highest_place = result.index(max(result))
-            # Preform the result
-            if highest_place < 4:
-                game.place_card(highest_place)
-            elif highest_place == 4:
-                game.trash()
-            else:
-                game.mix_hand()
+            if i % 60 == 0:
+                i = 0
+
+                # Get the networks choice
+                result = net.activate(game.get_network_inputs())
+                highest_place = result.index(max(result))
+
+                # Preform the result
+                if highest_place < 4:
+                    # This does not a count for if it want's to place in a full pile.
+                    game.place_card(highest_place)
+                elif highest_place == 4:
+                    game.trash()
+                else:
+                    game.mix_hand()
+            i += 1
