@@ -22,7 +22,6 @@ def eval_genomes(genomes, config):
     """
 
     # Go through all of the all the genomes and see how they do.
-    scores = []
     for genome_id, genome in genomes:
         genome.fitness = 0  # start with fitness level of 0
         net = neat.nn.FeedForwardNetwork.create(genome, config)
@@ -38,18 +37,30 @@ def eval_genomes(genomes, config):
 
             # Execute the results from the neural network.
             # The first four numbers in the list are for where to place the card.
-            card_rankings = result[0:4] # Get the first 4 nums
-            
-            # Loop over because if it's full pile it has to place in another place
-            placed = False
-            while not placed:
-                highest_num = max(card_rankings)
-                highest_place = card_rankings.index(highest_num)
-                #print(len(game.piles.piles[0]), len(game.piles.piles[1]), len(game.piles.piles[2]), len(game.piles.piles[3]))
+            highest_place = result.index(max(result)) # Get the highest num
+            if highest_place < 4:
                 if game.place_card(highest_place) == False:
-                    card_rankings.pop(highest_place)
+                    genome.fitness = game.score
+                    done = True
+                    break
+            elif highest_place < 6:
+                if highest_place == 4:
+                    if game.trashes == 0:
+                        genome.fitness = game.score
+                        done = True
+                        break
+                    else:
+                        game.trash()
+                    
                 else:
-                    placed = True
+                    if game.mix:
+                        game.mix_hand()
+                    else:
+                        genome.fitness = game.score
+                        done = True
+                        break  
+                    
+
 
 
             # Check if it's game over
