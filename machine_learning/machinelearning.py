@@ -1,15 +1,16 @@
 """
 This is the document for machine learning part of this program.
 It trains the AI using the neat python library.
+This is a neuroevolution not deep learning.
 """
 
 from math import floor
 
 import neat
-import pygame
 
-from cardclass import GameWithRender, NonRenderGame
-from funcs import render_multiline
+from cardclass import NonRenderGame
+from machine_learning.replaycheckpoint import replay_checkpoint
+from machine_learning.visualize import Visualizer
 
 # with render when i get to making some visulizestion of the winning neural network
 
@@ -18,6 +19,7 @@ WIDTH = 500
 HEIGHT = 400
 CHECKPOINT_GAP = 10
 
+
 def give_fitness(genome, score, _done):
     """
     This is to not repeat myself that much.
@@ -25,6 +27,7 @@ def give_fitness(genome, score, _done):
     """
     genome.fitness = score
     _done = True
+
 
 def eval_genomes(genomes, config):
     """
@@ -95,9 +98,10 @@ def machine_learning(config_file):
     stats = neat.StatisticsReporter()
     population.add_reporter(stats)
     population.add_reporter(neat.Checkpointer(CHECKPOINT_GAP))
-
-
-    how_many = int(input("How many iterations do you want to train the genomes? "))
+    plotter = Visualizer()
+    population.add_reporter(plotter)
+    how_many = int(
+        input("How many iterations do you want to train the genomes? "))
     # Run for up to 300 generations.
     winner = population.run(eval_genomes, how_many)
 
@@ -107,58 +111,16 @@ def machine_learning(config_file):
     # Calculate what the last checkpoint will be.
     last_checkpoint = CHECKPOINT_GAP * floor(how_many / CHECKPOINT_GAP) - 1
     print(last_checkpoint)
-    population = neat.Checkpointer.restore_checkpoint('neat-checkpoint-' + str(last_checkpoint))
+    population = neat.Checkpointer.restore_checkpoint(
+        'neat-checkpoint-' + str(last_checkpoint))
     population.run(eval_genomes, 10)
 
     # We will show the ai playing a game here.
     if input("Do you want to look a game of the best genome?[Y/n]: ") != "n":
-        game = GameWithRender(MAX_CARDS, 500, 400)
-        game.init_hand()
-        pygame.init()
-        screen = pygame.display.set_mode((WIDTH, HEIGHT))
-        clock = pygame.time.Clock()
-        comic_sans_font = pygame.font.SysFont('Comic Sans MS', 20)
-
-        net = neat.nn.FeedForwardNetwork.create(winner, config)
-
-        done = False
-        i = 0
-        while not done:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    done = True
-
-            pygame.display.flip()
-            screen.fill((50, 50, 50))  # Draw the background
-
-            # Render the game
-            game.render(comic_sans_font, screen, pygame)
-
-            # Render the text.
-            string_to_show = 'Score: {}\nMultiplier: x{}\nTrashes: {}'.format(
-                game.score, game.multiplier, game.trashes) + '\nMix: ' + str(game.mix)
-            render_multiline(
-                string_to_show,
-                WIDTH - 200, HEIGHT - 100,
-                screen, comic_sans_font,
-                (255, 255, 255)
-            )
-
-            clock.tick(60)
-
-            if i % 60 == 0:
-                i = 0
-
-                # Get the networks choice
-                result = net.activate(game.get_network_inputs())
-                highest_place = result.index(max(result))
-
-                # Preform the result
-                if highest_place < 4:
-                    # This does not a count for if it want's to place in a full pile.
-                    game.place_card(highest_place)
-                elif highest_place == 4:
-                    game.trash()
-                else:
-                    game.mix_hand()
-            i += 1
+        replay_checkpoint(
+            'neat-checkpoint-' + str(last_checkpoint),
+            eval_genomes, config,
+            MAX_CARDS,
+            WIDTH,
+            HEIGHT
+        )
