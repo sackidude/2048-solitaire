@@ -3,18 +3,20 @@ This is the document for machine learning part of this program.
 It trains the AI using the neat python library.
 """
 
+from math import floor
+
 import neat
 import pygame
 
-from cardclass import GameWithRender  # , GameWithRender # Will add the game
-from cardclass import NonRenderGame
+from cardclass import GameWithRender, NonRenderGame
 from funcs import render_multiline
 
 # with render when i get to making some visulizestion of the winning neural network
 
-MAX_CARDS = 6
+MAX_CARDS = 8
 WIDTH = 500
 HEIGHT = 400
+CHECKPOINT_GAP = 10
 
 def give_fitness(genome, score, _done):
     """
@@ -68,7 +70,7 @@ def eval_genomes(genomes, config):
                         give_fitness(genome, game.score, done)
                         break
 
-            # Check if it's game over
+            # Check if it's game over.
             if game.check_game_over():
                 give_fitness(genome, game.score, done)
 
@@ -89,10 +91,11 @@ def machine_learning(config_file):
     population = neat.Population(config)
 
     # Add a stdout reporter to show progress in the terminal.
-    population.add_reporter(neat.StdOutReporter(True))  # What does this do?
-    stats = neat.StatisticsReporter()  # Show the statistics
+    population.add_reporter(neat.StdOutReporter(True))
+    stats = neat.StatisticsReporter()
     population.add_reporter(stats)
-    population.add_reporter(neat.Checkpointer(5))
+    population.add_reporter(neat.Checkpointer(CHECKPOINT_GAP))
+
 
     how_many = int(input("How many iterations do you want to train the genomes? "))
     # Run for up to 300 generations.
@@ -101,7 +104,10 @@ def machine_learning(config_file):
     # Display the winning genome.
     print('\nBest genome:\n{!s}'.format(winner))
 
-    population = neat.Checkpointer.restore_checkpoint('neat-checkpoint-4')
+    # Calculate what the last checkpoint will be.
+    last_checkpoint = CHECKPOINT_GAP * floor(how_many / CHECKPOINT_GAP) - 1
+    print(last_checkpoint)
+    population = neat.Checkpointer.restore_checkpoint('neat-checkpoint-' + str(last_checkpoint))
     population.run(eval_genomes, 10)
 
     # We will show the ai playing a game here.
