@@ -82,7 +82,7 @@ class NonRenderGame:
                 except IndexError:
                     return_array.append(0)
                 else:
-                    return_array.append(self.piles.piles[i][j].value)
+                    return_array.append(self.piles.piles[i][j].value/11)
 
         # Add the hand to the array
         for card in self.hand.cards:
