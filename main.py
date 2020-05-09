@@ -6,7 +6,13 @@ and see what score it can get later(hopefully): )
 
 
 def main():
-    """Main function. just decides if you are going to boot normal game or machine learning"""
+    """
+    Main function.
+    Just decides if you are going to
+    * play a normal game,
+    * start machine learning
+    * or loads a saved checkpoint in the current directory
+    """
     input_text = input("Normal Game or Machine learning or replay checkpoint file[N/M/]: ")
 
     if input_text == "M":
