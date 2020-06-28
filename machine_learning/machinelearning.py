@@ -8,7 +8,7 @@ from math import floor
 
 import neat
 
-from cardclass import NonRenderGame
+import cardclass
 from machine_learning.replaycheckpoint import replay_checkpoint
 from machine_learning.visualize import Visualizer
 from funcs import normalize_arr, pick_random_element
@@ -20,15 +20,42 @@ WIDTH = 500
 HEIGHT = 400
 CHECKPOINT_GAP = 10
 RANDOMNESS = True
+RECALCULATE = 1
 
 
-def give_fitness(genome, score, _done):
+def do_action(todo_number, game):
     """
-    This is to not repeat myself that much.
-    It sets the genome fitness to a score and sets done to true
+    Does the action in game corresponding to n.
     """
-    genome.fitness = score
-    _done = True
+    if todo_number < 4:
+        # Comparison to false because it's normally None
+        if not game.place_card(todo_number):
+            return RECALCULATE
+    elif todo_number < 6:
+        if todo_number == 4:
+            if game.trashes == 0:
+                return RECALCULATE
+            game.trash()
+
+        else:
+            if game.mix:
+                game.mix_hand()
+            else:
+                return RECALCULATE
+
+
+def get_action(arr, random):
+    """
+    Gets the right action based, has option to do with randomness or not.
+    """
+    if random:
+        norm_arr = normalize_arr(arr)
+        return pick_random_element(norm_arr)
+    else:
+        # Execute the results from the neural network.
+        # The first four numbers in the list are for where to place the card.
+        return arr.index(
+            max(arr))  # Get the highest num
 
 
 def eval_genomes(genomes, config):
@@ -44,7 +71,7 @@ def eval_genomes(genomes, config):
     for genome_id, genome in genomes:
         genome.fitness = 0  # start with fitness level of 0
         net = neat.nn.FeedForwardNetwork.create(genome, config)
-        game = NonRenderGame(MAX_CARDS)
+        game = cardclass.MLGame(MAX_CARDS)
         game.init_hand()
 
         done = False
@@ -52,38 +79,25 @@ def eval_genomes(genomes, config):
             # Evaluate the current game situation
             result = net.activate(game.get_network_inputs())
 
-            if RANDOMNESS:
-                norm_arr = normalize_arr(result)
-                highest_place = pick_random_element(norm_arr)
-            else:
-                # Execute the results from the neural network.
-                # The first four numbers in the list are for where to place the card.
-                highest_place = result.index(
-                    max(result))  # Get the highest num
-
-            if highest_place < 4:
-                 # Comparison to false because it's normally None
-                if not game.place_card(highest_place):
-                    give_fitness(genome, game.score, done)
+            has_done_action = False
+            while not has_done_action:
+                if sum(result) == 0:
+                    has_done_action = True
+                    genome.fitness = game.score
+                    done = True
                     break
-            elif highest_place < 6:
-                if highest_place == 4:
-                    if game.trashes == 0:
-                        give_fitness(genome, game.score, done)
-                        break
-                    else:
-                        game.trash()
+                todo_action = get_action(result, RANDOMNESS)
 
+                if do_action(todo_action, game) == RECALCULATE:
+                    result[todo_action] = 0
                 else:
-                    if game.mix:
-                        game.mix_hand()
-                    else:
-                        give_fitness(genome, game.score, done)
-                        break
+                    has_done_action = True
+
 
             # Check if it's game over.
             if game.check_game_over():
-                give_fitness(genome, game.score, done)
+                genome.fitness = game.score
+                done = True
 
 
 def machine_learning(config_file):

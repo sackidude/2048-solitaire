@@ -3,6 +3,8 @@ from random import randrange
 import funcs
 
 
+INVALID_INPUT = 2
+
 class NonRenderGame:
     """This is the whole game class without any rendering."""
 
@@ -67,6 +69,11 @@ class NonRenderGame:
         self.mix = False
         self.hand.mix()
 
+
+class MLGame(NonRenderGame):
+    """
+    This is the normal game with machine learning related functions.
+    """
     def get_network_inputs(self):
         """
         This function is for the machine learning.
@@ -97,6 +104,11 @@ class NonRenderGame:
 
         return return_array
 
+    def get_action_random(self):
+        pass
+
+    def get_action_highest(self):
+        pass
 
 class GameWithRender(NonRenderGame):
     """Game With render function."""
@@ -140,8 +152,11 @@ class GameWithRender(NonRenderGame):
 
     def trash(self):
         """Throw away a card from the hand."""
+        if self.trashes == 0:
+            return INVALID_INPUT
         self.trashes -= 1
         self.hand.trash()
+        return None
 
 
 class NonRenderCard():

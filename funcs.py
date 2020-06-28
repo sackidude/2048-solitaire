@@ -2,8 +2,6 @@
 
 from random import random
 
-import numpy as np
-
 
 def translate(value, left_min, left_max, right_min, right_max):
     """This maps a value from one range to another. TY to the guy on stackoverflow"""
@@ -35,10 +33,11 @@ def normalize_arr(arr):
     Normalizes a normal python list.
     Probably works with numpy arrays too.
     """
-    temp_arr = np.array(arr)
-    total = temp_arr.sum()
-
-    return [i / total for i in temp_arr]
+    total = sum(arr)
+    if total == 0:
+        print("Arr is empty/All numbers are zero, returning [1], This is a warning")
+        return [1]
+    return [i / total for i in arr]
 
 
 def pick_random_element(arr):

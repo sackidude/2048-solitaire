@@ -5,7 +5,7 @@ This is a module that has a function that can replay a checkpoint file.
 import neat
 import pygame
 
-from cardclass import GameWithRender
+from cardclass import GameWithRender, INVALID_INPUT
 from funcs import render_multiline
 
 
@@ -59,14 +59,24 @@ def replay_checkpoint(cp_str, eval_function, config, max_cards, width, height, r
 
             # Get the networks choice
             result = net.activate(game.get_network_inputs())
-            highest_place = result.index(max(result))
 
-            # Preform the result
-            if highest_place < 4:
-                # This does not a count for if it want's to place in a full pile.
-                game.place_card(highest_place)
-            elif highest_place == 4:
-                game.trash()
-            else:
-                game.mix_hand()
+            has_placed = False
+            while not has_placed:
+                highest_place = result.index(max(result))
+
+                # Preform the result
+                if highest_place < 4:
+                    # This does not a count for if it want's to place in a full pile.
+                    game.place_card(highest_place)
+
+                elif highest_place == 4:
+                    response = game.trash()
+
+                    if response == INVALID_INPUT:
+                        result[highest_place] = 0
+                    else:
+                        has_placed = True
+
+                else:
+                    game.mix_hand()
         i += 1
