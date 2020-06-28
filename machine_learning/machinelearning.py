@@ -11,6 +11,7 @@ import neat
 from cardclass import NonRenderGame
 from machine_learning.replaycheckpoint import replay_checkpoint
 from machine_learning.visualize import Visualizer
+from funcs import normalize_arr, pick_random_element
 
 # with render when i get to making some visulizestion of the winning neural network
 
@@ -18,6 +19,7 @@ MAX_CARDS = 8
 WIDTH = 500
 HEIGHT = 400
 CHECKPOINT_GAP = 10
+RANDOMNESS = True
 
 
 def give_fitness(genome, score, _done):
@@ -50,9 +52,15 @@ def eval_genomes(genomes, config):
             # Evaluate the current game situation
             result = net.activate(game.get_network_inputs())
 
-            # Execute the results from the neural network.
-            # The first four numbers in the list are for where to place the card.
-            highest_place = result.index(max(result))  # Get the highest num
+            if RANDOMNESS:
+                norm_arr = normalize_arr(result)
+                highest_place = pick_random_element(norm_arr)
+            else:
+                # Execute the results from the neural network.
+                # The first four numbers in the list are for where to place the card.
+                highest_place = result.index(
+                    max(result))  # Get the highest num
+
             if highest_place < 4:
                  # Comparison to false because it's normally None
                 if not game.place_card(highest_place):
